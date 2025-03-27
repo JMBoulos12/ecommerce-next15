@@ -1,5 +1,26 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+The coding technologies used in this full-stack eCommerce project include:
+
+## Frontend:
+- Next.js 15 – Modern React framework for SSR (Server-Side Rendering) & SSG (Static Site Generation).
+- React 19 – Component-based UI development.
+- Tailwind CSS – Utility-first CSS framework for styling.
+- ShadcnUI – UI component library for modern and responsive design.
+
+## State Management:
+Zustand – Lightweight and simple state management for handling app state.
+
+## Backend & APIs:
+Next.js API Routes – Backend logic and data fetching.
+
+## Payments & E-commerce Features:
+- Stripe – Payment gateway integration for secure transactions.
+- Advanced Filtering & Live Stock Updates – Likely using Next.js API or Zustand for dynamic updates.
+
+## Deployment & Hosting:
+Likely deployed on Vercel (since Next.js is optimized for it).
+
 ## Getting Started
 
 First, run the development server:
