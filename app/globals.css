@@ -14,6 +14,7 @@
   --color-darkColor: #151515;
   --color-lightColor: #52525b;
   --color-lightOrange: #fca99b;
+  --color-shop_light_green: #3b9c3c;
 }
 
 :root {
@@ -129,5 +130,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .hoverEffect {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  button {
+    @apply hover:cursor-pointer;
   }
 }
