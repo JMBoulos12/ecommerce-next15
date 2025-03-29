@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-=======
-<<<<<<< HEAD
+
 ## ecommerce-next15
->>>>>>> ad0591b (Creating responsive header + sidebar + Menus + SocialMedia in progress -27/03/2025)
 
 The coding technologies used in this full-stack eCommerce project include:
 
