@@ -6,7 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - Shopcart online store",
+    template: "%s - BoulosShopcart online store",
     default: "Boulos online shop store",
   },
   description:

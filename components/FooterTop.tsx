@@ -10,14 +10,14 @@ interface ContactItemData {
 const data: ContactItemData[] = [
   {
     title: "Visit Us",
-    subtitle: "New Orlean, USA",
+    subtitle: "Beirut, LB",
     icon: (
       <MapPin className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
     ),
   },
   {
     title: "Call Us",
-    subtitle: "+12 958 648 597",
+    subtitle: "+961 70 860 312",
     icon: (
       <Phone className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
     ),
