@@ -13,7 +13,7 @@ interface Props {
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "preference";
+      _type: "reference";
       _weak?: boolean;
       [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
@@ -22,7 +22,7 @@ interface Props {
     _type: "image";
     _key: string;
   }>;
-  isStock?: number;
+  isStock?: number | undefined;
 }
 
 const ImageView = ({ images = [], isStock }: Props) => {
