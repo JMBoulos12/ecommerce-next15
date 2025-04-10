@@ -6,7 +6,7 @@
 
 @theme {
   --font-poppins: "Poppins", sans-serif;
-  --color-shop_light_pink: #fcf0e4;
+  --color-shop_light_pink: #cff7cf;
   --color-shop_dark_green: #063c28;
   --color-shop_btn_dark_green: #063d29;
   --color-shop_light_bg: #f6f6f6;
@@ -150,4 +150,8 @@
 
 body {
   font-family: var(--font-poppins);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
