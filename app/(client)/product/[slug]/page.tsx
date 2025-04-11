@@ -6,6 +6,7 @@ import PriceView from "@/components/PriceView";
 import ProductCharacteristics from "@/components/ProductCharacteristics";
 import { getProductBySlug } from "@/sanity/queries";
 import { CornerDownLeft, StarIcon, Truck } from "lucide-react";
+import { notFound } from "next/navigation";
 import React from "react";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
@@ -19,7 +20,9 @@ const SingleProductPage = async ({
 }) => {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-
+  if (!product) {
+    return notFound();
+  }
   return (
     <Container className="flex flex-col md:flex-row gap-10 py-10">
       {product?.images && (
