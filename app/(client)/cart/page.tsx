@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  createCheckoutSession,
+  Metadata,
+} from "@/actions/createCheckoutSession";
 import Container from "@/components/Container";
 import EmptyCart from "@/components/EmptyCart";
 import NoAccess from "@/components/NoAccess";
@@ -15,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Address } from "@/sanity.types";
@@ -22,8 +27,6 @@ import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import useStore from "@/store";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { log } from "console";
 import { ShoppingBag, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -46,10 +49,10 @@ const CartPage = () => {
   const [addresses, setAddresses] = useState<Address[] | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
-  const fetchAddPresses = async () => {
+  const fetchAddresses = async () => {
     setLoading(true);
     try {
-      const query = `*[_type=="address] | order(publishedAt desc)`;
+      const query = `*[_type=="address"] | order(publishedAt desc)`;
       const data = await client.fetch(query);
       setAddresses(data);
       const defaultAddress = data.find((addr: Address) => addr.default);
@@ -65,7 +68,7 @@ const CartPage = () => {
     }
   };
   useEffect(() => {
-    fetchAddPresses();
+    fetchAddresses();
   }, []);
   const handleResetCart = () => {
     const confirmed = window.confirm(
@@ -74,6 +77,27 @@ const CartPage = () => {
     if (confirmed) {
       resetCart();
       toast.success("Cart reset successfully!");
+    }
+  };
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const metadata: Metadata = {
+        orderNumber: crypto.randomUUID(),
+        customerName: user?.fullName ?? "Unknown",
+        customerEmail: user?.emailAddresses[0]?.emailAddress ?? "Unknown",
+        clerkUserId: user?.id,
+        address: selectedAddress,
+      };
+      const checkoutUrl = await createCheckoutSession(groupedItems, metadata);
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      }
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -100,7 +124,8 @@ const CartPage = () => {
                             {product?.images && (
                               <Link
                                 href={`/product/${product?.slug?.current}`}
-                                className="border p-0.5 md:p-1 mr-2 rounded-md overflow-hidden group"
+                                className="border p-0.5 md:p-1 mr-2 rounded-md
+                                 overflow-hidden group"
                               >
                                 <Image
                                   src={urlFor(product?.images[0]).url()}
@@ -108,7 +133,7 @@ const CartPage = () => {
                                   width={500}
                                   height={500}
                                   loading="lazy"
-                                  className="w-32 md:w-40 h-32 md:h-60 object-cover group-hover:scale-105 hoverEffect"
+                                  className="w-32 md:w-40 h-32 md:h-40 object-cover group-hover:scale-105 hoverEffect"
                                 />
                               </Link>
                             )}
@@ -147,12 +172,10 @@ const CartPage = () => {
                                     <TooltipTrigger>
                                       <Trash
                                         onClick={() => {
-                                          {
-                                            deleteCartProduct(product?._id),
-                                              toast.success(
-                                                "Product deleted successfully"
-                                              );
-                                          }
+                                          deleteCartProduct(product?._id);
+                                          toast.success(
+                                            "Product deleted successfully!"
+                                          );
                                         }}
                                         className="w-4 h-4 md:w-5 md:h-5 mr-1 text-gray-500 hover:text-red-600 hoverEffect"
                                       />
@@ -168,7 +191,7 @@ const CartPage = () => {
                           <div className="flex flex-col items-start justify-between h-36 md:h-44 p-0.5 md:p-1">
                             <PriceFormatter
                               amount={(product?.price as number) * itemCount}
-                              className="text-lg font-bold"
+                              className="font-bold text-lg"
                             />
                             <QuantityButtons product={product} />
                           </div>
@@ -212,6 +235,8 @@ const CartPage = () => {
                         <Button
                           className="w-full rounded-full font-semibold tracking-wide hoverEffect"
                           size="lg"
+                          disabled={loading}
+                          onClick={handleCheckout}
                         >
                           {loading ? "Please wait..." : "Proceed to Checkout"}
                         </Button>
@@ -233,13 +258,13 @@ const CartPage = () => {
                                 <div
                                   key={address?._id}
                                   onClick={() => setSelectedAddress(address)}
-                                  className={`flex items-center space-x-2 mb-4 cursor-pointer $(selectedAddress?.id === address?._id && "text-shop_dark_green")`}
+                                  className={`flex items-center space-x-2 mb-4 cursor-pointer ${selectedAddress?._id === address?._id && "text-shop_dark_green"}`}
                                 >
                                   <RadioGroupItem
                                     value={address?._id.toString()}
                                   />
                                   <Label
-                                    htmlFor={`address-$(address?._id)`}
+                                    htmlFor={`address-${address?._id}`}
                                     className="grid gap-1.5 flex-1"
                                   >
                                     <span className="font-semibold">
@@ -266,6 +291,34 @@ const CartPage = () => {
                 <div className="md:hidden fixed bottom-0 left-0 w-full bg-white pt-2">
                   <div className="bg-white p-4 rounded-lg border mx-4">
                     <h2>Order Summary</h2>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span>SubTotal</span>
+                        <PriceFormatter amount={getSubTotalPrice()} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Discount</span>
+                        <PriceFormatter
+                          amount={getSubTotalPrice() - getTotalPrice()}
+                        />
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between font-semibold text-lg">
+                        <span>Total</span>
+                        <PriceFormatter
+                          amount={getTotalPrice()}
+                          className="text-lg font-bold text-black"
+                        />
+                      </div>
+                      <Button
+                        className="w-full rounded-full font-semibold tracking-wide hoverEffect"
+                        size="lg"
+                        disabled={loading}
+                        onClick={handleCheckout}
+                      >
+                        {loading ? "Please wait..." : "Proceed to Checkout"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
