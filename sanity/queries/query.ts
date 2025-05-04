@@ -56,7 +56,7 @@ const SINGLE_BLOG_QUERY =
 
 const BLOG_CATEGORIES = defineQuery(
   `*[_type == "blog"]{
-     blogcategories[]->{
+    blogcategories[]->{
     ...
     }
   }`
