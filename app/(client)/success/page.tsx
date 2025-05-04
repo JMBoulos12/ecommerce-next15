@@ -1,25 +1,22 @@
 "use client";
 
 import useStore from "@/store";
-import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { motion } from "motion/react";
 import { Check, Home, Package, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
-const SuccessPage = () => {
-  const { user } = useUser();
+const SuccessPageContent = () => {
   const { resetCart } = useStore();
   const searchParams = useSearchParams();
-  const session_id = searchParams.get("session_id");
   const orderNumber = searchParams.get("orderNumber");
 
   useEffect(() => {
-    if (session_id) {
+    if (orderNumber) {
       resetCart();
     }
-  }, [session_id, resetCart]);
+  }, [orderNumber, resetCart]);
   return (
     <div className="py-5 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-4">
       <motion.div
@@ -76,6 +73,14 @@ const SuccessPage = () => {
         </div>
       </motion.div>
     </div>
+  );
+};
+
+const SuccessPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessPageContent />
+    </Suspense>
   );
 };
 
